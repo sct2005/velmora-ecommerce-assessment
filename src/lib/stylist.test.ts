@@ -93,7 +93,7 @@ describe('parseText', () => {
   })
   it('is honest about colours and fabrics we do not list', () => {
     const p = parseText('yellow lace dress', TODAY)
-    expect(p.notes.join(' ')).toMatch(/No pieces are listed in yellow/)
+    expect(p.notes.join(' ')).toMatch(/No pieces are listed in "yellow"/)
     expect(p.notes.join(' ')).toMatch(/lace/)
   })
   it('does not guess vague dates', () => {

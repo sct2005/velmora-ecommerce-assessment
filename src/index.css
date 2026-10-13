@@ -219,6 +219,20 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
   .stylist-page .filter-row { grid-template-columns: 1fr 1fr; }
 }
 
+/* stylist additions */
+.quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip-quick { background: var(--ivory-2); border-color: var(--ivory-2); text-align: left; }
+.chip-quick:hover:not(:disabled) { border-color: var(--ink); }
+.chip:disabled { opacity: .5; cursor: progress; }
+.chip-small { min-height: 32px; padding: 0 10px; font-size: .85rem; margin: 0 4px 4px 0; }
+.extra-filters { margin: 0 0 8px; }
+.read-as { margin-top: 10px; }
+.loading { color: var(--ink-2); font-style: italic; }
+.pick-differs { margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--warn); }
+.pick-cta { display: inline-block; margin-top: 4px; font-size: .9rem; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.alt-title { font-size: 1.4rem; margin: 20px 0 12px; }
+.reader-note { margin: 16px 0 0; }
+
 /* ---------- Product page ---------- */
 .crumbs { padding-top: 16px; padding-bottom: 8px; font-size: .85rem; }
 .crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }

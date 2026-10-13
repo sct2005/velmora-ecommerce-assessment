@@ -36,7 +36,7 @@ npm run preview      # serve dist/ at http://localhost:4173
 npm run check:browser  # with preview running (first time: npx playwright install chromium)
 ```
 
-No environment variables are needed. There are no API keys anywhere in the project.
+No environment variables are needed to run the site. The optional AI reader uses a server-side key; see the stylist section. There are no keys in the repository or the browser bundle.
 
 ## Data and accuracy
 
@@ -53,29 +53,39 @@ Catalogue quirks handled rather than hidden:
 - `brand.md` gives prices "from £60 to £690"; the catalogue runs £90 to £680. The site uses catalogue prices.
 - Some descriptions name a colour that isn't the first listed; the product page opens on the colour the description names.
 
-## The occasion stylist
+## The occasion stylist ("Find your occasion look")
 
-**It is rule-based, not a language model, and says so on the page.** It asks for occasion, date, delivery region, budget, size, type and colour, or reads a typed request ("a dress for a winter wedding on 12 December under £400, something red") with deterministic keyword parsing.
+Customers describe their occasion in their own words, or tap a suggestion. The stylist suggests up to three real pieces, each with its listed price, the reasons it matches and an estimated arrival date. The customer can then refine the request or the filters.
 
-It then:
+**How it decides (and why it can't invent anything):**
 
-- filters the catalogue on those facts and drops pieces whose estimated arrival is after the occasion date;
-- suggests up to three pieces, each with its real price and reasons built from catalogue fields;
-- says what it couldn't use: unlisted colours ("We don't list red, so I looked for oxblood"), unlisted fabrics, sizes outside UK 6–18, past or vague dates, delivery outside the UK and EU;
-- when nothing matches, says so and shows which single change would produce matches, with real counts and prices;
-- asks for more when the request is empty.
+1. **Reading the request.** If `ANTHROPIC_API_KEY` is set on the server, `api/read-brief.js` asks Claude to fill a fixed schema: occasion, budget, colours, fabric, cut, type, size, date, region, plus things the catalogue can't answer. Every value must come from a list taken from `products.json`. Any phrase it echoes back must appear word for word in the customer's request. If no key is set, or the call fails, times out or returns anything malformed, fixed rules in the browser do the same job. The page always says which reader was used.
+2. **Validation.** `shared/brief-schema.js` checks every reading on the server and again in the browser. Unknown values, invented product names and implausible dates are dropped.
+3. **Choosing pieces.** Deterministic rules in `src/lib/stylist.ts` filter `products.json`. The model never sees prices or stock and cannot choose or describe products. Every reason shown is built from a catalogue field.
 
-**Why not a model?** The brief's hard rule is never inventing a product, price or date. A model would mainly help read free text. The safe design, and the next step, is a server-side function (Vercel/Netlify) that asks a model only to turn text into the same `Brief` object, validated against the allowed values, with selection staying in the tested rules and the current parser as the fallback. The key would live in the host's environment variables, never in the browser bundle.
+**What it tells customers plainly:**
+- **Colours:** words we don't list, and the closest colour used instead (for example "burgundy" becomes oxblood).
+- **Things we don't cover:** occasions we don't list (graduation, summer wedding), sizes outside UK 6–18, attributes the catalogue doesn't record (sleeves, length, neckline), and that there are no reviews, discount data or stock counts.
+- **Unknown pieces:** product names that don't exist.
+- **Vague requests:** vague dates and requests that need clarifying ("party").
+- **When nothing matches:** which single change would produce matches, with real counts and prices, and the two closest real pieces with how each one differs.
+
+**Turning the AI reader on (optional).** In Vercel, open Project → Settings → Environment Variables. Add `ANTHROPIC_API_KEY` for Production, then redeploy. Optionally set `STYLIST_MODEL`; the default is `claude-haiku-5-5`. The key is only read by the server function; it is never in the browser bundle or the repository. Each request costs a small amount of Anthropic API usage, so set a monthly spend limit in the Anthropic console. The endpoint only accepts calls from the site's own pages and caps input at 400 characters, but it has no per-visitor rate limit.
+
+| Environment variable | Required | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | No | Turns on the Claude reader. Without it, the rule reader is used. |
+| `STYLIST_MODEL` | No | Model ID override. |
 
 ## Testing
 
-- `npm test`: 19 tests covering catalogue integrity, delivery-date arithmetic, recommendation grounding, impossible and ambiguous requests, and text parsing.
+- `npm test`: 35 tests. They cover catalogue integrity, delivery dates, the stylist brief's ten scenarios on the real catalogue, untrusted model output, allowed-value drift against `products.json`, and the server function with a mocked Claude API (no key, rate limit, server error, malformed reply, timeout, foreign origin).
 - `npm run check:browser`: Playwright run at 375, 768 and 1280 px: no horizontal overflow on any page; product facts; size-required error; add to bag; disabled checkout; Escape closes the bag; unavailable and unknown products; stylist results and empty state; hero form; skip link.
 - Not yet measured: Lighthouse performance and accessibility scores, and testing on a real phone.
 
 ## Deploy
 
-Deployed on **Vercel** (Hobby, free) through the GitHub integration: every push to `main` redeploys. No environment variables are set or needed.
+Deployed on **Vercel** (Hobby, free) through the GitHub integration: every push to `main` redeploys. `api/read-brief.js` deploys automatically as a Vercel Function. The SPA rewrite in `vercel.json` excludes `/api/`.
 
 The site is static; any of these hosts work:
 

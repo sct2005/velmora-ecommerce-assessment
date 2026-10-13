@@ -94,12 +94,12 @@ export function Home() {
 
       <section className="stylist-section" id="stylist" aria-labelledby="st-title">
         <div className="section-head">
-          <h2 id="st-title">Ask the stylist</h2>
+          <h2 id="st-title">Find your occasion look</h2>
           <Link to="/stylist" className="text-link">Open full stylist</Link>
         </div>
         <p className="lede-small">
-          Describe your occasion, date and budget. The stylist suggests up to three pieces from the collection and checks
-          the estimated arrival against your date. It tells you when nothing fits.
+          Tell the stylist about your occasion in your own words. It suggests up to three pieces from the collection,
+          explains each match, checks the estimated arrival against your date, and tells you when nothing fits.
         </p>
         <Stylist compact />
       </section>

@@ -10,13 +10,13 @@ import { Product } from './pages/Product'
 
 function StylistPage() {
   const { search } = useRouter()
-  useEffect(() => { document.title = 'Occasion stylist | Velmora' }, [])
+  useEffect(() => { document.title = 'Find your occasion look | Velmora' }, [])
   return (
     <section className="stylist-page">
-      <h1>Occasion stylist</h1>
+      <h1>Find your occasion look</h1>
       <p className="lede-small">
-        Tell us the occasion, the date and your budget. We'll suggest up to three pieces from the collection and check
-        whether they can arrive in time.
+        Tell us about your occasion in your own words: what it is, when, your budget and colours you like. We'll suggest
+        up to three pieces from the collection and check whether they can arrive in time.
       </p>
       <Stylist init={{ occasion: search.get('occasion') ?? undefined, date: search.get('date') ?? undefined }} />
     </section>
