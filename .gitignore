@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+
+# Build outputs
+dist/
+build/
+out/
+coverage/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+secrets/
+credentials.json
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.profile
+.ipython/
+
+# Generated GIS and temporary files
+*.tmp
+*.temp
+*.bak
+*.aux.xml
+*.qix
+*.gpkg-shm
+*.gpkg-wal
+*.lock
+
+# Generated model files and checkpoints
+*.pt
+*.pth
+*.onnx
+*.h5
+*.pkl
+*.joblib
+checkpoints/
+runs/
+
+# Generated reports and exports (uncomment if appropriate)
+# reports/generated/
+# exports/
+
+# Local configuration
+*.local
+
+# OS / tool caches
+.cache/
+tmp/
+temp/
