@@ -1,4 +1,5 @@
 **LOG**
+<br>
 *11:30(13/10/26)* repository created,files uploaded, structure set out, claude skills and context added 
 <br>
 *12:30(13/10/26)* first claude commit, front end developed and acessible via localhost
