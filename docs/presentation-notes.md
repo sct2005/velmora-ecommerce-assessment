@@ -1,0 +1,10 @@
+# 10-minute presentation
+
+1. **The customer and the problem (1 min).** Women 28–45 buying for a dated occasion. They decide on fit, fabric and delivery date. Most pieces take 14–21 days to make. 79% of visits are on a phone; no reviews or photos yet.
+2. **Home page (2 min).** The hero is a sentence the customer completes: occasion and date, leading straight to pieces that can arrive in time. Delivery timing is the decision, so it goes first. Then how made to order works (three real numbers), shop by occasion (counts from the catalogue), the stylist. Colour panels stand in honestly for missing photography.
+3. **Product page (1.5 min).** VLM-008: matches the target query, near the average order, shortest dress lead time, brand colour. Size required before adding; estimated arrival for UK/EU and the customer's own date, labelled as an estimate; returns rule visible; demo checkout says no payment is taken.
+4. **Stylist (2 min).** Demo: "winter wedding on 12 December under £400, something red" → two oxblood Vela dresses, with reasons and arrival estimates. Then "yellow lace jumpsuit under £100" → says no match, explains why, suggests the nearest real option. Rules, not a model: why, and how a model would be added safely.
+5. **The numbers and the plan (2.5 min).** Mobile checkout completion 14% vs desktop 57% with identical add-to-cart: the biggest lever. Paid social ROAS 1.25 under a 1.82 break-even: lost ~£843. Email £9.80 per session vs Instagram £1.58: capture Instagram traffic with honest order-by dates, within 20 pieces a week.
+6. **Limits and what I'd cut (1 min).** Not done: real photography, a live checkout, Lighthouse scores, a real-device test, pre-rendering for search. I'd cut the all-pieces page before anything else; I'd add the model-backed text reader next.
+
+Likely questions: how ROAS and break-even were calculated; why not A/B test (volume); how the stylist can't invent a product (it can only filter `products.json`; tests check every pick); what "estimate" means (lead time + published shipping, calendar days).
