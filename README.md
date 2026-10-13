@@ -2,6 +2,8 @@
 
 A home page, product page and occasion stylist for Velmora, a fictional London evening-wear label, plus a one-page commercial plan built from the supplied analytics. Velmora and all its data are invented for the assessment.
 
+- **Live site:** https://velmora-ecommerce-assessment.vercel.app (Vercel, deploys automatically from `main`)
+- **Repository:** https://github.com/sct2005/velmora-ecommerce-assessment
 - **Commercial plan:** [`commercial-plan.md`](commercial-plan.md)
 - **Analytics workings:** [`analysis/sales-findings.md`](analysis/sales-findings.md), reproducible with `python3 analysis/analyse.py`
 - **Presentation notes:** [`docs/presentation-notes.md`](docs/presentation-notes.md)
@@ -73,7 +75,9 @@ It then:
 
 ## Deploy
 
-Static site; any of these work:
+Deployed on **Vercel** (Hobby, free) through the GitHub integration: every push to `main` redeploys. No environment variables are set or needed.
+
+The site is static; any of these hosts work:
 
 - **Vercel:** import the repository; `vercel.json` sets the build and SPA rewrites.
 - **Netlify / Cloudflare Pages:** build command `npm run build`, output `dist`. `public/_redirects` handles deep links.
