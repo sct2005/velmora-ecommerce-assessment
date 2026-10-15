@@ -95,6 +95,8 @@ Lighthouse 12, run on the production build served locally (`vite preview`), simu
 | Product `/pieces/VLM-008` | Mobile | 96–100 | 100 | 100 | 100 |
 | Product `/pieces/VLM-008` | Desktop | 100 | 100 | 100 | 100 |
 
+**Live site check:** PageSpeed Insights on https://velmora-ecommerce-assessment.vercel.app, home page, mobile (Lighthouse 13.5, emulated Moto G Power, slow 4G), 15 Oct 11:14: Performance 97, Accessibility 100, Best practices 100, SEO 100. First and largest contentful paint 2.0 s, total blocking time 0 ms, layout shift 0.
+
 Performance varied between runs (ranges shown). The first run scored SEO 91 because the site had no `robots.txt`; adding one fixed it. Mobile largest contentful paint was 1.5 s (home) and 2.3 s (product) under simulated slow 4G; layout shift was 0.03 or lower.
 
 ## Deploy
