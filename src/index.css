@@ -268,6 +268,8 @@ legend { font-size: .9rem; font-weight: 500; margin-bottom: 8px; padding: 0; }
 .verdict-tight { border-color: var(--warn); }
 .verdict-too-late, .verdict-past { border-color: var(--oxblood); }
 .arrival .small { margin: 0; }
+.xmas { margin: 12px 0; padding: 10px 12px; background: var(--ivory); border-left: 3px solid var(--oxblood); }
+.xmas-passed { border-left-color: var(--stone); color: var(--ink-2); }
 .specs { margin: 28px 0 0; border-top: 1px solid var(--line); }
 .specs div { display: grid; grid-template-columns: 7.5rem 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
 .specs dt { color: var(--ink-2); }

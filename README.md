@@ -43,6 +43,7 @@ No environment variables are needed to run the site. The optional AI reader uses
 - The supplied files stay at the repository root, unmodified: `brand.md`, `products.json`, `analytics.csv`, `CLAUDE.md` and `docs/GIS-Analytics-assessment.pdf`. The original materials README is now [`MATERIALS.md`](MATERIALS.md), unchanged. The site imports `products.json` directly; there is no second copy of product facts in the code.
 - Nothing is invented: no reviews, ratings, stock counts or scarcity. Thin descriptions in the catalogue are shown as supplied, with the structured fields (fabric, fit, colours, occasions, sizes, making time) alongside.
 - **Delivery estimates** = `lead_time_days` + shipping from `brand.md` (UK 3–5 days, EU 5–8), counted as calendar days and always labelled as estimates, never guaranteed dates.
+- **Christmas order-by dates** on each product page = Christmas Eve minus (`lead_time_days` + the slow end of shipping) for the chosen region. For example, a 21-day piece must be ordered by 28 November for UK delivery and 25 November for EU delivery. Shown as "too late" once the date has passed; never shown for unavailable pieces.
 - **No photography exists.** Each piece is shown as colour panels in its listed colours, with a surface that suggests its fabric, and the site says so.
 - **Checkout is a demo.** The bag works; checkout is disabled and says no order is placed and no payment is taken.
 
@@ -70,7 +71,7 @@ Customers describe their occasion in their own words, or tap a suggestion. The s
 - **Vague requests:** vague dates and requests that need clarifying ("party").
 - **When nothing matches:** which single change would produce matches, with real counts and prices, and the two closest real pieces with how each one differs.
 
-**Turning the AI reader on (optional).** In Vercel, open Project → Settings → Environment Variables. Add `ANTHROPIC_API_KEY` for Production, then redeploy. Optionally set `STYLIST_MODEL`; the default is `claude-haiku-5-5`. The key is only read by the server function; it is never in the browser bundle or the repository. Each request costs a small amount of Anthropic API usage, so set a monthly spend limit in the Anthropic console. The endpoint only accepts calls from the site's own pages and caps input at 400 characters, but it has no per-visitor rate limit.
+**Turning the AI reader on (optional).** In Vercel, open Project → Settings → Environment Variables. Add `ANTHROPIC_API_KEY` for Production, then redeploy. Optionally set `STYLIST_MODEL`; the default is `claude-haiku-5-5`. The key is only read by the server function; it is never in the browser bundle or the repository. Each request costs a small amount of Anthropic API usage, so set a monthly spend limit in the Anthropic console. The endpoint only accepts calls from the site's own pages, caps input at 400 characters, and allows each visitor 20 model calls per 10 minutes; past that it returns 429 and the page falls back to the rule reader. The limit is kept in memory, so each Vercel instance counts separately: it stops casual abuse, not a determined attacker, so the Anthropic spend limit remains the backstop.
 
 | Environment variable | Required | Purpose |
 |---|---|---|
@@ -79,8 +80,8 @@ Customers describe their occasion in their own words, or tap a suggestion. The s
 
 ## Testing
 
-- `npm test`: 35 tests. They cover catalogue integrity, delivery dates, the stylist brief's ten scenarios on the real catalogue, untrusted model output, allowed-value drift against `products.json`, and the server function with a mocked Claude API (no key, rate limit, server error, malformed reply, timeout, foreign origin).
-- `npm run check:browser`: Playwright run at 375, 768 and 1280 px: no horizontal overflow on any page; product facts; size-required error; add to bag; disabled checkout; Escape closes the bag; unavailable and unknown products; stylist results and empty state; hero form; skip link.
+- `npm test`: 41 tests in 4 files. They cover catalogue integrity, delivery dates and Christmas cut-offs, the stylist brief's ten scenarios on the real catalogue, untrusted model output, allowed-value drift against `products.json`, the sitemap against the catalogue, and the server function with a mocked Claude API (no key, upstream rate limit, server error, malformed reply, timeout, foreign origin, per-visitor rate limit).
+- `npm run check:browser`: 43 Playwright checks at 375, 768 and 1280 px: no horizontal overflow on any page; product facts; size-required error; add to bag; disabled checkout; Escape closes the bag; unavailable and unknown products; stylist results and empty state; hero form; skip link.
 - Real phone: home page, product page, bag and stylist checked by hand on a phone (13 Oct).
 - Live stylist: 12 scripted requests run against the live site with the Claude reader on, all 12 passed (15 Oct). They covered unlisted occasions, vague requests, a made-up product, unsupported sizes and details, EU delivery, an instruction-override attempt, and stock and discount questions.
 
@@ -97,7 +98,7 @@ Lighthouse 12, run on the production build served locally (`vite preview`), simu
 
 **Live site check:** PageSpeed Insights on https://velmora-ecommerce-assessment.vercel.app, home page, mobile (Lighthouse 13.5, emulated Moto G Power, slow 4G), 15 Oct 11:14: Performance 97, Accessibility 100, Best practices 100, SEO 100. First and largest contentful paint 2.0 s, total blocking time 0 ms, layout shift 0.
 
-Performance varied between runs (ranges shown). The first run scored SEO 91 because the site had no `robots.txt`; adding one fixed it. Mobile largest contentful paint was 1.5 s (home) and 2.3 s (product) under simulated slow 4G; layout shift was 0.03 or lower.
+Performance varied between runs (ranges shown). The first run scored SEO 91 because the site had no `robots.txt`; adding one fixed it. `robots.txt` now also points to `sitemap.xml`, which lists the home, pieces and stylist pages and all 48 product pages (a test keeps it in step with the catalogue). Mobile largest contentful paint was 1.5 s (home) and 2.3 s (product) under simulated slow 4G; layout shift was 0.03 or lower.
 
 ## Deploy
 

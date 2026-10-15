@@ -3,7 +3,7 @@ import { COLOUR_HEX, cap, findProduct, gbp, isOrderable, joinAnd, occasionLabel,
 import { ProductCard } from '../components/ProductCard'
 import { Swatch } from '../components/Swatch'
 import { useBag } from '../lib/bag'
-import { checkDate, estimate, fmtDate, fmtRange, makingLine, parseISODate, toISODate, type Region } from '../lib/delivery'
+import { checkDate, christmasOrderBy, estimate, fmtDate, fmtRange, makingLine, parseISODate, toISODate, type Region } from '../lib/delivery'
 import { Link } from '../lib/router'
 import { NotFound } from './NotFound'
 
@@ -53,6 +53,7 @@ export function Product({ id }: { id: string }) {
   const est = estimate(p, region)
   const occasionDate = parseISODate(date)
   const dc = est && occasionDate ? checkDate(est, occasionDate) : undefined
+  const xmas = christmasOrderBy(p, region)
   const related = products.filter((x) => x.id !== p.id && isOrderable(x) && x.occasions.some((o) => p.occasions.includes(o))).slice(0, 4)
 
   const onAdd = () => {
@@ -144,6 +145,13 @@ export function Product({ id }: { id: string }) {
                   {dc.verdict === 'tight' && `Close: the estimate runs up to ${fmtDate(occasionDate!)}. A piece with a shorter making time is safer.`}
                   {dc.verdict === 'too-late' && `Unlikely to arrive before ${fmtDate(occasionDate!)}. Try the stylist for pieces that can.`}
                   {dc.verdict === 'past' && 'That date has passed.'}
+                </p>
+              )}
+              {xmas && (
+                <p className={`xmas ${xmas.passed ? 'xmas-passed' : ''}`} data-testid="xmas-order-by">
+                  {xmas.passed
+                    ? `Christmas: too late for ${region} delivery by Christmas Eve, based on the published making and delivery times.`
+                    : <>Christmas: order by <strong>{fmtDate(xmas.date)}</strong> for {region} delivery by Christmas Eve.</>}
                 </p>
               )}
               <p className="small muted">

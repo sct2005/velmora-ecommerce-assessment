@@ -47,6 +47,11 @@ await page.screenshot({ path: `${OUT}/flow-after-add-390.png` })
 // Arrival check: a date in the past of the estimate
 await page.locator('.arrival input[type=date]').fill('2099-01-01')
 ok('in-time verdict for far date', await page.locator('.verdict-in-time').isVisible())
+const xmas = await page.locator('[data-testid=xmas-order-by]').innerText()
+ok('Christmas order-by from real lead time (VLM-008: 14 + 5 days -> 5 Dec, UK)', /order by Sat,? 5 Dec for UK delivery by Christmas Eve/.test(xmas), JSON.stringify(xmas))
+await page.locator('.arrival select').selectOption('EU')
+ok('Christmas order-by switches with region (EU: 14 + 8 days -> 2 Dec)', /order by Wed,? 2 Dec for EU/.test(await page.locator('[data-testid=xmas-order-by]').innerText()))
+await page.locator('.arrival select').selectOption('UK')
 
 // Unavailable piece
 await page.goto(BASE + '/pieces/VLM-021')

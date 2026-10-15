@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { products, findProduct } from '../data/catalogue'
-import { estimate, checkDate } from './delivery'
+import { estimate, checkDate, christmasOrderBy } from './delivery'
 import { parseText, recommend } from './stylist'
 
 const TODAY = new Date(2026, 9, 13) // 13 Oct 2026
@@ -36,6 +36,22 @@ describe('delivery estimate', () => {
     expect(checkDate(e, new Date(2026, 10, 20), TODAY).verdict).toBe('in-time')
     expect(checkDate(e, new Date(2026, 9, 31), TODAY).verdict).toBe('tight')
     expect(checkDate(e, new Date(2026, 9, 25), TODAY).verdict).toBe('too-late')
+  })
+})
+
+describe('christmas order-by', () => {
+  it('works back from Christmas Eve using making time and the slow end of shipping', () => {
+    expect(christmasOrderBy(findProduct('VLM-003')!, 'UK', TODAY)!.date).toEqual(new Date(2026, 10, 28)) // 21 + 5 days
+    expect(christmasOrderBy(findProduct('VLM-003')!, 'EU', TODAY)!.date).toEqual(new Date(2026, 10, 25)) // 21 + 8 days
+    expect(christmasOrderBy(findProduct('VLM-008')!, 'UK', TODAY)!.date).toEqual(new Date(2026, 11, 5)) // 14 + 5
+    expect(christmasOrderBy(findProduct('VLM-048')!, 'UK', TODAY)!.date).toEqual(new Date(2026, 11, 16)) // stock: 3 + 5
+  })
+  it('says when the cut-off has passed, and skips unavailable pieces', () => {
+    expect(christmasOrderBy(findProduct('VLM-003')!, 'UK', new Date(2026, 11, 1))!.passed).toBe(true)
+    expect(christmasOrderBy(findProduct('VLM-021')!, 'UK', TODAY)).toBeNull()
+  })
+  it('rolls to next year after Christmas Eve', () => {
+    expect(christmasOrderBy(findProduct('VLM-008')!, 'UK', new Date(2026, 11, 27))!.target).toEqual(new Date(2027, 11, 24))
   })
 })
 

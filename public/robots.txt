@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://velmora-ecommerce-assessment.vercel.app/sitemap.xml

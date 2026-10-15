@@ -82,3 +82,25 @@ export function toISODate(d: Date): string {
   const p = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
+
+export interface OrderBy {
+  /** Latest order date whose latest estimated arrival is on or before the target. */
+  date: Date
+  target: Date
+  /** True when that order date has already passed. */
+  passed: boolean
+}
+
+/**
+ * Christmas cut-off: the last day to order so the latest estimate (making time + the slow end
+ * of published shipping) lands by Christmas Eve. Uses only catalogue and brand.md facts.
+ */
+export function christmasOrderBy(p: Product, region: Region, today: Date = new Date()): OrderBy | null {
+  if (!isOrderable(p)) return null
+  const t = startOfDay(today)
+  let year = t.getFullYear()
+  if (t > new Date(year, 11, 24)) year += 1
+  const target = new Date(year, 11, 24)
+  const date = addDays(target, -(p.lead_time_days + SHIPPING_DAYS[region][1]))
+  return { date, target, passed: date < t }
+}

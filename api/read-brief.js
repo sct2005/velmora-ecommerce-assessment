@@ -31,6 +31,25 @@ Rules:
 
 const json = (status, body) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } })
 
+// Per-visitor rate limit: at most RATE_MAX model calls per visitor per RATE_WINDOW_MS.
+// Kept in memory, so each server instance counts separately: it stops casual abuse,
+// not a determined attacker. The Anthropic spend limit remains the hard backstop.
+const RATE_MAX = 20
+const RATE_WINDOW_MS = 10 * 60 * 1000
+const hits = new Map()
+function visitor(request) {
+  const fwd = request.headers.get('x-forwarded-for')
+  return (fwd ? fwd.split(',')[0].trim() : request.headers.get('x-real-ip')) || 'unknown'
+}
+export function rateLimited(id, now = Date.now()) {
+  const recent = (hits.get(id) || []).filter((t) => now - t < RATE_WINDOW_MS)
+  if (recent.length >= RATE_MAX) { hits.set(id, recent); return true }
+  recent.push(now); hits.set(id, recent)
+  if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW_MS)) hits.delete(k)
+  return false
+}
+export function resetRateLimit() { hits.clear() }
+
 export async function POST(request) {
   // Only accept calls from pages on the same host.
   const origin = request.headers.get('origin')
@@ -54,6 +73,7 @@ export async function POST(request) {
 
   const key = process.env.ANTHROPIC_API_KEY
   if (!key) return json(503, { error: 'not_configured' })
+  if (rateLimited(visitor(request))) return json(429, { error: 'rate_limited' })
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)

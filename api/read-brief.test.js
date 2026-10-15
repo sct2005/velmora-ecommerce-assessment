@@ -1,6 +1,6 @@
 // Server function tests with the Claude API mocked. No real key or network is used.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { POST, GET } from './read-brief.js'
+import { POST, GET, resetRateLimit } from './read-brief.js'
 
 const call = (body, headers = {}) =>
   POST(new Request('https://velmora.example/api/read-brief', {
@@ -15,7 +15,7 @@ const toolResponse = (input) => new Response(JSON.stringify({
 }), { status: 200, headers: { 'content-type': 'application/json' } })
 
 describe('POST /api/read-brief', () => {
-  beforeEach(() => { delete process.env.ANTHROPIC_API_KEY })
+  beforeEach(() => { delete process.env.ANTHROPIC_API_KEY; resetRateLimit() })
   afterEach(() => { vi.unstubAllGlobals(); delete process.env.ANTHROPIC_API_KEY })
 
   it('returns 503 not_configured without a key, and never calls the API', async () => {
@@ -69,5 +69,17 @@ describe('POST /api/read-brief', () => {
     expect(await malformed.json()).toEqual({ error: 'malformed' })
     vi.stubGlobal('fetch', vi.fn(async () => { const e = new Error('aborted'); e.name = 'AbortError'; throw e }))
     expect((await call({ text: 'gala' })).status).toBe(504)
+  })
+
+  it('limits each visitor to 20 model calls per 10 minutes, then falls back', async () => {
+    process.env.ANTHROPIC_API_KEY = 'test-key'
+    const fetchSpy = vi.fn(async () => toolResponse({ occasion: 'gala', categories: [], colours: [], fabrics: [], fits: [] }))
+    vi.stubGlobal('fetch', fetchSpy)
+    for (let i = 0; i < 20; i++) expect((await call({ text: 'gala' }, { 'x-forwarded-for': '203.0.113.7' })).status).toBe(200)
+    const limited = await call({ text: 'gala' }, { 'x-forwarded-for': '203.0.113.7' })
+    expect(limited.status).toBe(429)
+    expect(await limited.json()).toEqual({ error: 'rate_limited' })
+    expect(fetchSpy).toHaveBeenCalledTimes(20)
+    expect((await call({ text: 'gala' }, { 'x-forwarded-for': '198.51.100.2' })).status).toBe(200) // another visitor is unaffected
   })
 })
